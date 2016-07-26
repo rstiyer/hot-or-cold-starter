@@ -48,8 +48,8 @@ function resetCount() {
 }
 
 function increaseCount() {
-	updateCount();
 	guessCount++;
+	updateCount();
 }
 
 function updateCount() {
