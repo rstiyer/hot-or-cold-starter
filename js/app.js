@@ -23,8 +23,8 @@ $(document).ready(function(){
   		e.preventDefault();
   		var userInput = getUserInput();
   		if (isValidInput(userInput)) {
-  			recordGuess(userInput);
   			updateFeedback(userInput);
+  			recordGuess(userInput);
   		} else {
   			alert('Please choose an integer between 1 and 100, inclusive.')
   		}
@@ -48,8 +48,8 @@ function resetCount() {
 }
 
 function increaseCount() {
-	guessCount++;
 	updateCount();
+	guessCount++;
 }
 
 function updateCount() {
@@ -76,7 +76,7 @@ function getUserInput() {
 
 function updateFeedback(userInput) {
 	var distance = calculateDistanceFromSecret(userInput);
-	var feedbackMsg = temperatureFeedback(distance);
+	var feedbackMsg = determineAppropriateFeedback(distance);
 	displayFeedback(feedbackMsg);
 }
 
@@ -84,19 +84,38 @@ function calculateDistanceFromSecret(userInput) {
 	return Math.abs(userInput - secret);
 }
 
-function temperatureFeedback(distance) {
-	if (distance >= 50)
-		return "Ice Cold";
-	else if (distance >= 30)
-		return "Cold";
-	else if (distance >= 20)
-		return "Warm";
-	else if (distance >= 10)
-		return "Hot";
-	else if (distance >= 1)
-		return "Very Hot";
+function determineAppropriateFeedback(distanceFromSecret) {
+	if (distanceFromSecret === 0)
+		return "You guessed the secret!"
+	else if (guessCount === 0)
+		return absoluteFeedbackMsg(distanceFromSecret);
 	else
-		return "You got it!"
+		return relativeFeedbackMsg(distanceFromSecret);
+}
+
+function absoluteFeedbackMsg(distanceFromSecret) {
+	if (distanceFromSecret >= 50)
+		return "Ice Cold";
+	else if (distanceFromSecret >= 30)
+		return "Cold";
+	else if (distanceFromSecret >= 20)
+		return "Warm";
+	else if (distanceFromSecret >= 10)
+		return "Hot";
+	else
+		return "Very Hot";
+}
+
+function relativeFeedbackMsg(distanceFromSecret) {
+	var prevGuess = getPrevGuess();
+	if (distanceFromSecret < calculateDistanceFromSecret(prevGuess))
+		return "Warmer";
+	else
+		return "Colder";
+}
+
+function getPrevGuess() {
+	return $('ul#guessList li:last-child').text();
 }
 
 function displayFeedback(feedbackMsg) {
